@@ -240,7 +240,6 @@ class TixcraftTicketAssistant(Component):
         )
         optional_seat_context = None
         candidate_word = calculator.highest_similarity()
-        breakpoint()
         for context in contexts:
             if context.seat_name == candidate_word:
                 optional_seat_context = context
