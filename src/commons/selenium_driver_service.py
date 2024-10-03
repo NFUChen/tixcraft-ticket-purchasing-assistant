@@ -9,7 +9,7 @@ import selenium
 import selenium.webdriver
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.chromium.options import ChromiumOptions
-from py_spring import Component, Properties
+from py_spring_core import Component, Properties
 
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.common.by import By

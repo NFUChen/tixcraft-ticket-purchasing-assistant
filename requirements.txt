@@ -37,8 +37,8 @@ packaging==24.1
 pillow==10.4.0
 protobuf==5.28.2
 psycopg2-binary==2.9.9
-py_spring @ git+https://github.com/PythonSpring/pyspring-core.git@c3fead833f6e6ab1f5a1f4aaa7f96597abdb9a39
-py_spring_model @ git+https://github.com/PythonSpring/pyspring-model.git@eaebd15f87f87e8ea1577f3fd0544482bdd0d5d8
+py_spring_core==0.0.4
+py_spring_model @ git+https://github.com/PythonSpring/pyspring-model.git@2e3725928a72d23aeaef8f42024859eefa3192d8
 pydantic==2.8.2
 pydantic-extra-types==2.9.0
 pydantic-settings==2.4.0

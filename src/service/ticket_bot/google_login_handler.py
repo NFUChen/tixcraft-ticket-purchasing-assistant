@@ -4,7 +4,7 @@ from re import T
 import time
 from typing import ClassVar
 from loguru import logger
-from py_spring import Component
+from py_spring_core import Component
 from pydantic import BaseModel
 import selenium
 import selenium.webdriver

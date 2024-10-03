@@ -1,4 +1,4 @@
-from py_spring import PySpringApplication
+from py_spring_core import PySpringApplication
 from py_spring_model import provide_py_spring_model
 from src.service.ticket_bot.google_login_handler import GoogleLoginCredential
 from src.service.ticket_bot.tixcraft_ticket_assistant import Event, TixcraftTicketAssistant

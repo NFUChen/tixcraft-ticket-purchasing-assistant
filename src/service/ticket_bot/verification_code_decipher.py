@@ -1,4 +1,4 @@
-from py_spring import Component, BeanCollection
+from py_spring_core import Component, BeanCollection
 from typing import cast
 from ddddocr import DdddOcr
 

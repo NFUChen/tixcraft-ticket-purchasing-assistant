@@ -1,4 +1,4 @@
-from py_spring import RestController
+from py_spring_core import RestController
 
 
 class MainController(RestController):
