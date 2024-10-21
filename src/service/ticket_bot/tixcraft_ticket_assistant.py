@@ -18,13 +18,18 @@ from src.commons.selenium_driver_service import (
     SeleniumNoSuchElementException,
 )
 from src.service.ticket_bot.google_login_handler import (
-    GoogleLoginCredential,
     GoogleLoginHandler,
 )
 from src.repository.repository import LoginTokenRepository
-from src.service.ticket_bot.commons import DriverKey
+from src.service.ticket_bot.commons import DriverKey, LoginCredential
 from src.service.ticket_bot.word_similarity_calculator import WordSimilarityCalculator
 from src.service.ticket_bot.verification_code_decipher import VerificationCodeDecipher
+
+
+"""
+Cookie Signature:
+{"domain": "tixcraft.com", "httpOnly": true, "name": "SID", "path": "/", "sameSite": "None", "secure": true, "value": "xxx"}
+"""
 
 class Event(BaseModel):
     event_key_word: str
@@ -107,12 +112,12 @@ class TixcraftTicketAssistant(Component):
     google_login_handler: GoogleLoginHandler
     code_decipher: VerificationCodeDecipher
 
-    def async_purchase_ticket(self, credential: GoogleLoginCredential, event: Event) -> None:
+    def async_purchase_ticket(self, credential: LoginCredential, event: Event) -> None:
         threading.Thread(target= lambda: self.purchase_ticket(credential, event)).start()
         
 
     @timer
-    def purchase_ticket(self, credential: GoogleLoginCredential, event: Event) -> None:
+    def purchase_ticket(self, credential: LoginCredential, event: Event) -> None:
         logger.info(
             f"[PURCHASE TICKET] Start purchasing ticket for event:\n {event.as_view()}"
         )
@@ -120,7 +125,14 @@ class TixcraftTicketAssistant(Component):
             logger.info(
                 f"[PURCHASE TICKET] Start purchasing ticket for event: {event.event_key_word}"
             )
-            token_read = self.google_login_handler.login(credential)
+            token_read = self.token_repo.get_token_by_email(credential.email)
+            
+            if token_read is None:
+                logger.error(
+                    f"[PURCHASE TICKET] Token not found for email: {credential.email}"
+                )
+                return
+
             driver = self.driver_service.get_driver(DriverKey.TIXCRAFT)
             self._go_to_activities_page(driver)
             self._load_token(driver, json.loads(token_read.token))
@@ -330,29 +342,32 @@ class TixcraftTicketAssistant(Component):
         self, driver: WebDriver, event: Event
     ) -> bool:
         logger.info(f"[EVENT PAGE] Go to event entry page: {event.event_key_word}")
-        if len(event.exclude_key_words) == 0:
-            target_events = [
-                a_tag
-                for a_tag in driver.find_elements(By.TAG_NAME, "a")
-                if event.event_key_word in a_tag.text
-            ]
-        else:
-            target_events = [
-                a_tag
-                for a_tag in driver.find_elements(By.TAG_NAME, "a")
-                if event.event_key_word in a_tag.text
-                and all(
-                    exclude_key_word not in a_tag.text
-                    for exclude_key_word in event.exclude_key_words
-                )
-            ]
-        if len(target_events) == 0:
+        all_anchor_tags:dict[str, WebElement] = {
+            tag.text: tag 
+            for tag in driver.find_elements(By.TAG_NAME, "a") 
+        }
+        target_events: dict[str, WebElement] = {}
+        
+        for tag_text, tag in all_anchor_tags.items():
+            if event.event_key_word in tag_text:
+                target_events[tag_text] = tag
+
+        popped_tags: set[str] = set()
+        for tag_text in target_events.keys():
+            for excluded_keyword in event.exclude_key_words:
+                if excluded_keyword in tag_text:
+                    popped_tags.add(tag_text)
+                    break
+        for tag_text in popped_tags:
+            target_events.pop(tag_text)
+
+        if len(target_events.keys()) == 0:
             logger.error(f"[EVENT NOT FOUND] Event {event.event_key_word} not found")
             return False
-        target_event_url = target_events.pop().get_attribute("href")
+        target_event_url = list(target_events.values()).pop().get_attribute("href")
         if target_event_url is None:
             raise Exception(f"[EVENT URL NOT FOUND] Event {event.event_key_word} url not found")
-
+        breakpoint()
         driver.get(target_event_url)
         logger.info(f"[EVENT PAGE] Go to event page: {event.event_key_word}")
         # 等待立即購票按鈕出現

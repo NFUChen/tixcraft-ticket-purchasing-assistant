@@ -22,18 +22,12 @@ from src.commons.selenium_driver_service import (
 from src.repository.common import LoginTokenRead, TixcraftApiSource
 from src.repository.models import LoginToken
 from src.repository.repository import LoginTokenRepository
-from src.service.ticket_bot.commons import DriverKey
+from src.service.ticket_bot.commons import DriverKey, LoginCredential
 
 RawToken = str
 
 
-class GoogleLoginCredential(BaseModel):
-    """
-    Remember to disable 2FA for the account you want to use to login
-    """
 
-    email: str
-    password: str
 
 
 class GoogleLoginHandler(Component):
@@ -42,7 +36,7 @@ class GoogleLoginHandler(Component):
     tixcraft_api_source: TixcraftApiSource
     token_repo: LoginTokenRepository
 
-    def login(self, credential: GoogleLoginCredential) -> LoginTokenRead:
+    def login(self, credential: LoginCredential) -> LoginTokenRead:
         token = self.token_repo.get_token_by_email(credential.email)
         logger.info(f"[TOKEN REGRIVED] Email: {credential.email} with token: {token}")
         if token is None or token.is_expired:
@@ -74,7 +68,7 @@ class GoogleLoginHandler(Component):
         return json.dumps(sid_cookie)
 
     def _login_with_driver(
-        self, driver: WebDriver, credential: GoogleLoginCredential
+        self, driver: WebDriver, credential: LoginCredential
     ) -> RawToken:
         driver.get(self.tixcraft_api_source.google_login_url)
         self._enter_credentials(driver, credential)
@@ -142,7 +136,7 @@ class GoogleLoginHandler(Component):
         time.sleep(10)
 
     def _enter_credentials(
-        self, driver: WebDriver, credential: GoogleLoginCredential
+        self, driver: WebDriver, credential: LoginCredential
     ) -> None:
         account_element = driver.find_element(By.ID, "identifierId")
         account_element.send_keys(credential.email)

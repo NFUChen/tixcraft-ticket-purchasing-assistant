@@ -105,7 +105,7 @@ class SeleniumDriverService(Component):
         return driver
 
     def _get_remote_driver(self) -> WebDriver:
-        options = ChromiumOptions()
+        options = self._get_chrome_options()
         logger.info(
             f"[REMOTE HOST CONNECTION] Connect to remote_host: {self.properties.remote_host}"
         )
