@@ -1,6 +1,6 @@
 from py_spring_core import PySpringApplication
 from py_spring_model import provide_py_spring_model
-from src.service.ticket_bot.google_login_handler import GoogleLoginCredential
+from src.service.ticket_bot.google_login_handler import LoginCredential
 from src.service.ticket_bot.tixcraft_ticket_assistant import Event, TixcraftTicketAssistant
 import typer
 
@@ -28,7 +28,7 @@ def purchase_ticket(
         payment_key_words=[kw.strip() for kw in payment_key_words.split(',') if kw != ''],
         exclude_key_words=[kw.strip() for kw in exclude_key_words.split(',') if kw != '']
     )
-    credential = GoogleLoginCredential(email=email, password=password)
+    credential = LoginCredential(email=email, password=password)
 
     # Initialize and run the application
     app_instance = PySpringApplication(config_file, [provide_py_spring_model()])
