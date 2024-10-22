@@ -112,6 +112,17 @@ class TixcraftTicketAssistant(Component):
     google_login_handler: GoogleLoginHandler
     code_decipher: VerificationCodeDecipher
 
+    def __create_cookie(self, token: str) -> dict[str, str | bool]:
+        return {
+            "name": "SID",
+            "value": token,
+            "domain": "tixcraft.com",
+            "path": "/",
+            "secure": True,
+            "httpOnly": True,
+            "sameSite": "None",
+        }
+
     def async_purchase_ticket(self, credential: LoginCredential, event: Event) -> None:
         threading.Thread(target= lambda: self.purchase_ticket(credential, event)).start()
         
@@ -135,7 +146,8 @@ class TixcraftTicketAssistant(Component):
 
             driver = self.driver_service.get_driver(DriverKey.TIXCRAFT)
             self._go_to_activities_page(driver)
-            self._load_token(driver, json.loads(token_read.token))
+            tixcraft_cookie = self.__create_cookie(token_read.token)
+            self._load_token(driver, tixcraft_cookie)
             is_found_entry_page = self._go_to_ticket_purchasing_enty_page(driver, event)
             if not is_found_entry_page:
                 logger.error("[PURCHASE TICKET] Event not found, skipping current purchase")
@@ -344,7 +356,7 @@ class TixcraftTicketAssistant(Component):
         logger.info(f"[EVENT PAGE] Go to event entry page: {event.event_key_word}")
         all_anchor_tags:dict[str, WebElement] = {
             tag.text: tag 
-            for tag in driver.find_elements(By.TAG_NAME, "a") 
+            for tag in driver.find_element(By.ID, "all").find_elements(By.TAG_NAME, "a") 
         }
         target_events: dict[str, WebElement] = {}
         
@@ -367,7 +379,6 @@ class TixcraftTicketAssistant(Component):
         target_event_url = list(target_events.values()).pop().get_attribute("href")
         if target_event_url is None:
             raise Exception(f"[EVENT URL NOT FOUND] Event {event.event_key_word} url not found")
-        breakpoint()
         driver.get(target_event_url)
         logger.info(f"[EVENT PAGE] Go to event page: {event.event_key_word}")
         # 等待立即購票按鈕出現
@@ -394,7 +405,7 @@ class TixcraftTicketAssistant(Component):
                 return
             time.sleep(2)
 
-    def _load_token(self, driver: WebDriver, injected_cookie: dict[str, str]) -> None:
+    def _load_token(self, driver: WebDriver, injected_cookie: dict[str, str | bool]) -> None:
         logger.info("[COOKIE] Loading token...")
         for cookie in driver.get_cookies():
             if cookie["name"] != injected_cookie["name"]:
