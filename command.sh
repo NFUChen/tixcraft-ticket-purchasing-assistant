@@ -1,0 +1,11 @@
+source .venv/bin/activate && python3 main.py \
+    --number_of_tickets 2 \
+    --event-key-word "周杰倫 嘉年華" \
+    --event-datetime "2024/12/07" \
+    --seat-key-word "211" \
+    --number_of_tickets 2 \
+    --delivery-key-words "ibon,FamiPort,7-11, 現場取票, 國內配送" \
+    --payment-key-words "ATM,信用卡,Credit Card" \
+    --exclude-key-words "" \
+    --email "" \
+    --password ""
