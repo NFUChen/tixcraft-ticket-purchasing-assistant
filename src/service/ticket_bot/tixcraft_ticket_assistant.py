@@ -34,7 +34,7 @@ Cookie Signature:
 class Event(BaseModel):
     event_key_word: str
     seat_key_word: str
-    number_of_tickets: int = 1
+    number_of_tickets: int
     delivery_key_words: list[str]
     payment_key_words: list[str]
 
@@ -292,6 +292,7 @@ class TixcraftTicketAssistant(Component):
             logger.info(
                 "[PURCHASE TICKET] Keep clicking purchase button until ticket is available"
             )
+
             purchase_button = driver.find_element(By.CLASS_NAME, "buy")
             web_driver_utils.browser_scroll_to_element(driver, purchase_button)
             is_found_purchase_button = False

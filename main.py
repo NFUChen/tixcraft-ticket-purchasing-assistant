@@ -10,6 +10,7 @@ app = typer.Typer()
 def purchase_ticket(
     event_key_word: str = typer.Option(..., help="Keyword for the event."),
     event_datetime: str = typer.Option(..., help="Date and time of the event (YYYY/MM/DD)."),
+    number_of_tickets: int = typer.Option(..., help="Number of tickets to purchase."),
     seat_key_word: str = typer.Option(..., help="Keyword for the seat."),
     delivery_key_words: str = typer.Option(..., help="Delivery methods (comma-separated)."),
     payment_key_words: str = typer.Option(..., help="Payment methods (comma-separated)."),
@@ -23,6 +24,7 @@ def purchase_ticket(
     event = Event(
         event_key_word=event_key_word,
         event_datetime=event_datetime,
+        number_of_tickets=number_of_tickets,
         seat_key_word=seat_key_word,
         delivery_key_words=[kw.strip() for kw in delivery_key_words.split(',') if kw != ''],
         payment_key_words=[kw.strip() for kw in payment_key_words.split(',') if kw != ''],
