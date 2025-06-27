@@ -1,12 +1,13 @@
 from typing import Optional
 from uuid import UUID
-from py_spring_model import CrudRepository
+from py_spring_model import CrudRepository, Query
 
 from src.repository.common import LoginTokenRead
 from src.repository.models import LoginToken
 
 
-class LoginTokenRepository(CrudRepository[UUID, LoginToken]):
+class LoginTokenRepository(CrudRepository[UUID, LoginToken]):    
+    @Query("SELECT * FROM login_token WHERE email = {email}")
     def get_token_by_email(self, email: str) -> Optional[LoginTokenRead]:
         _, optional_token = self._find_by_query({"email": email})
         if optional_token is None:
