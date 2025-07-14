@@ -1,12 +1,8 @@
-from enum import Enum
 import json
-from re import T
 import time
 from typing import ClassVar
 from loguru import logger
 from py_spring_core import Component
-from pydantic import BaseModel
-import selenium
 import selenium.webdriver
 
 from src.commons.selenium_driver_service import (

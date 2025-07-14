@@ -1,7 +1,0 @@
-psycopg2-binary==2.9.9
-py_spring_core==0.0.13
-py_spring_model @ git+https://github.com/PythonSpring/pyspring-model.git@b48e405a5ef4bf5f128c713981b325957177b641
-PyYAML==6.0.2
-undetected-chromedriver==3.5.5
-selenium==4.25.0
-ddddocr==1.5.5

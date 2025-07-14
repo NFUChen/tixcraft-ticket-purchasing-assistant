@@ -1,0 +1,15 @@
+[project]
+name = "tixcraft"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "ddddocr>=1.5.6",
+    "psycopg2-binary>=2.9.10",
+    "py-spring-core>=0.0.16",
+    "selenium>=4.34.2",
+    "undetected-chromedriver>=3.5.5",
+    "py_spring_model @ git+https://github.com/PythonSpring/pyspring-model.git@da4ccde11f8d789ad2507cc20af26cc24b497539",
+    "setuptools>=80.9.0",
+]
