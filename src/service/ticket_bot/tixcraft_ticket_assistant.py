@@ -123,12 +123,12 @@ class TixcraftTicketAssistant(Component):
             "sameSite": "None",
         }
 
-    def async_purchase_ticket(self, credential: LoginCredential, event: Event) -> None:
-        threading.Thread(target= lambda: self.purchase_ticket(credential, event)).start()
+    def async_purchase_ticket(self, credential: LoginCredential, event: Event, service_ip: str) -> None:
+        threading.Thread(target= lambda: self.purchase_ticket(credential, event, service_ip)).start()
         
 
     @timer
-    def purchase_ticket(self, credential: LoginCredential, event: Event) -> None:
+    def purchase_ticket(self, credential: LoginCredential, event: Event, service_ip: str) -> None:
         logger.info(
             f"[PURCHASE TICKET] Start purchasing ticket for event:\n {event.as_view()}"
         )
@@ -143,8 +143,7 @@ class TixcraftTicketAssistant(Component):
                     f"[PURCHASE TICKET] Token not found for email: {credential.email}"
                 )
                 return
-
-            driver = self.driver_service.get_driver(DriverKey.TIXCRAFT)
+            driver = self.driver_service.get_driver(service_ip)
             self._go_to_activities_page(driver)
             tixcraft_cookie = self.__create_cookie(token_read.token)
             self._load_token(driver, tixcraft_cookie)
