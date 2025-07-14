@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: chrome
+spec:
+  selector:
+    app: chrome
+  ports:
+    - port: 4444
+      targetPort: 4444
+      protocol: TCP
+      name: webdriver
+    - port: 5900
+      targetPort: 5900
+      protocol: TCP
+      name: vnc

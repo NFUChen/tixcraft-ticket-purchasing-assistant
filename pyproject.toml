@@ -12,4 +12,5 @@ dependencies = [
     "undetected-chromedriver>=3.5.5",
     "py_spring_model @ git+https://github.com/PythonSpring/pyspring-model.git@da4ccde11f8d789ad2507cc20af26cc24b497539",
     "setuptools>=80.9.0",
+    "pyhelm3>=0.4.0",
 ]

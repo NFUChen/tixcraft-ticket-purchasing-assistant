@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chrome
+  labels:
+    app: chrome
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chrome
+  template:
+    metadata:
+      labels:
+        app: chrome
+    spec:
+      containers:
+        - name: chrome
+          image: selenium/standalone-chrome:130.0-20250707
+          ports:
+            - containerPort: 4444   # WebDriver port
+            - containerPort: 5900   # VNC port
+          resources:
+            limits:
+              memory: "2Gi"
+              cpu: "1000m"
+            requests:
+              memory: "1Gi"
+              cpu: "500m"
