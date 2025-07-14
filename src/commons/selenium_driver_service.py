@@ -1,7 +1,7 @@
 from enum import Enum
 import math
 import time
-from typing import Optional
+from typing import ClassVar, Optional
 from typing_extensions import Self
 from loguru import logger
 from pydantic import BaseModel, Field, field_validator, model_validator
@@ -34,22 +34,9 @@ class DriverMode(str, Enum):
     Remote = "remote"
 
 
-class SeleniumProperties(Properties):
-    __key__: str = "selenium"
-    remote_host: str
-    mode: DriverMode
-    chrome_binary_path: Optional[str] = Field(default=None)
-
-    @model_validator(mode="after")
-    def check_chrome_binary_path(self) -> Self:
-        if self.mode == DriverMode.Local and self.chrome_binary_path is None:
-            raise ValueError("chrome_binary_path is required when mode is local")
-        return self
-
 
 class SeleniumDriverService(Component):
-    properties: SeleniumProperties
-
+    REMOTE_DRIVER_URL_TEMPLATE: ClassVar[str] = "http://{service_ip}:4444/wd/hub"
     def __init__(self) -> None:
         self.driver_pool: dict[str, WebDriver] = {}
 
@@ -62,14 +49,10 @@ class SeleniumDriverService(Component):
             for key, driver in self.driver_pool.items():
                 self._close_driver(driver, key)
 
-    def get_driver(self, driver_key: str) -> WebDriver:
-        match self.properties.mode:
-            case DriverMode.Local:
-                driver = self._get_local_driver()
-            case DriverMode.Remote:
-                driver = self._get_remote_driver()
-
-        self.driver_pool[driver_key] = driver
+    def get_driver(self, service_ip: str) -> WebDriver:
+        driver = self._get_remote_driver(service_ip)
+        logger.info(f"[WEBDRIVER GET] Get webdriver: {service_ip}")
+        self.driver_pool[service_ip] = driver
         driver.maximize_window()
         return driver
 
@@ -95,22 +78,12 @@ class SeleniumDriverService(Component):
         options.set_capability("unhandledPromptBehavior", "accept and notify")
         options.add_argument("--incognito")
         options.add_argument("--disable-smooth-scrolling")
-        if self.properties.chrome_binary_path is None:
-            raise ValueError("chrome_binary_path is required when mode is local")
-        options.binary_location = self.properties.chrome_binary_path
         return options
 
-    def _get_local_driver(self) -> WebDriver:
-        driver = UndetectedChrome(options=self._get_chrome_options())
-        return driver
-
-    def _get_remote_driver(self) -> WebDriver:
+    def _get_remote_driver(self, service_ip: str) -> WebDriver:
         options = self._get_chrome_options()
-        logger.info(
-            f"[REMOTE HOST CONNECTION] Connect to remote_host: {self.properties.remote_host}"
-        )
         driver = WebDriver(
-            command_executor=self.properties.remote_host,
+            command_executor=self.REMOTE_DRIVER_URL_TEMPLATE.format(service_ip = service_ip),
             options=options,
             keep_alive=True,
         )
