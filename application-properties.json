@@ -8,7 +8,7 @@
     "google_login_url": "https://accounts.google.com/o/oauth2/auth/oauthchooseaccount?response_type=code&redirect_uri=https%3A%2F%2Ftixcraft.com%2Flogin%2Fgoogle&client_id=540205048391.apps.googleusercontent.com&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email&access_type=offline&approval_prompt=auto&flowName=GeneralOAuthFlow&service=lso&o2v=1&ddm=0"
   },
   "py_spring_model": {
-    "sqlalchemy_database_uri": "postgresql://admins:admin@localhost:5432/db",
+    "sqlalchemy_database_uri": "sqlite:///db.sqlite3",
     "model_file_postfix_patterns": ["models.py"]
   }
 }
